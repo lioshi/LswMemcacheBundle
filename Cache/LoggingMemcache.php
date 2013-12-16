@@ -683,6 +683,8 @@ if ($extension->getVersion()<2) {
                     } else {
                         $cacheLinksContent[$key] = $linkedModels;
                     }
+                    $this->set($cacheLinks,$cacheLinksContent,0); 
+                    
                 } else {
                     $this->set($cacheLinks,array($key => $linkedModels),0);                    
                 }
