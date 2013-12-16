@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Memcache Doctrine caching and session storage in the Web Debug Toolbar (forked by lioshi)",
     "keywords": ["memcache","memcached","cache","session"],
-    "homepage": "http://www.leaseweblabs.com",
+    "homepage": "https://github.com/lioshi/LswMemcacheBundle",
     "license": "MIT",
     "authors": [
         {
