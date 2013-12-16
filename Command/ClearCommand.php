@@ -9,6 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
+use Lsw\MemcacheBundle\Cache\CacheInvalidator as CacheInvalidator;
+
 /**
  * Provides a command-line interface for flushing memcache content
  */
@@ -27,7 +29,10 @@ class ClearCommand extends ContainerAwareCommand
         ->setDescription('Invalidate all Memcache items')
         ->setDefinition(array(
             new InputArgument('client', InputArgument::REQUIRED, 'The client'),
-        ));
+            new InputArgument('prefix', InputArgument::OPTIONAL, 'Delete only cache keys with this prefix'),
+        ))
+        
+        ;
    }
 
    /**
@@ -43,7 +48,23 @@ class ClearCommand extends ContainerAwareCommand
         $client = $input->getArgument('client');
         try {
             $memcache = $this->getContainer()->get('memcache.'.$client);
-            $output->writeln($memcache->flush()?'<info>OK</info>':'<error>ERROR</error>');
+            
+            // total flush or delete by prefix?
+            if ($input->getArgument('prefix') && $input->getArgument('prefix')){
+              $prefix = $input->getArgument('prefix');
+              $CacheInvalidator = new CacheInvalidator($this->getContainer());
+              $i=0;
+              foreach ($CacheInvalidator->getMemcacheKeys() as $key) {
+                // $output->writeln('<comment>'.$key.'</comment>');
+                if (substr($key, 0, strlen($prefix)) == $prefix){
+                  $i++;
+                  $output->writeln($memcache->delete($key)?'<info>Delete cache key "'.$key.'" OK</info>':'<error>Delete cache key "'.$key.'" ERROR</error>');
+                }
+              }
+              if (!$i) $output->writeln('<info>No cache delete</info>');
+            } else {
+              $output->writeln($memcache->flush()?'<info>Delete all cache OK</info>':'<error>Delete all cache ERROR</error>');
+            }
         } catch (ServiceNotFoundException $e) {
             $output->writeln("<error>client '$client' is not found</error>");
         }
@@ -74,6 +95,18 @@ class ClearCommand extends ContainerAwareCommand
                 }
             );
             $input->setArgument('client', $client);
+        }
+
+        if (!$input->getArgument('prefix')) {
+            $prefix = $this->getHelper('dialog')->askAndValidate(
+                $output,
+                'Please give the prefix and enter, or enter directly:',
+                function($prefix)
+                {
+                   return $prefix;
+                }
+            );
+            $input->setArgument('prefix', $prefix);
         }
     }
 
