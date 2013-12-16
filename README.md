@@ -13,12 +13,43 @@ It has full Web Debug Toolbar integration that allows you to analyze and debug t
 
 [Read the LeaseWebLabs blog about LswMemcacheBundle](http://www.leaseweblabs.com/2013/03/memcache-support-in-symfony2-wdt/)
 
+---
 ### Added by lioshi
 #### Cache invalidator
-... to complete
+When doctrine made an insert/update/delete action... to complete
 
 #### Ful page cache
 ... to complete
+
+####Plusieurs façons de créer du cache
+Dans un controleur (cache memcached) en spécifiant les entities qui sont liées. Afin que le cahce invalidator puisse les supprimer.
+
+    $this->container->get('memcache.default')->set(
+        'suffix_all', 
+        $returnSort, 
+        3600, 
+        array(  'Testa\ArticleBundle\Motif', 
+                'Testa\ArticleBundle\Article'
+        )
+    );
+
+Dans une requete doctrine (cache result doctrine), !! attention au TTL (time to live) 
+
+    $tags = $this->createQueryBuilder('tag')
+         ->select('tag.name')
+         ->getQuery()
+         ->useResultCache(true, 3600, '#tag#results_suffix_all')    
+         ->getResult()
+     ;
+
+####Gestion du cache 
+L'idée est de nommer les clef de cache en les préfixant par le ou les modèle desquelles le cache dépend. 
+Exemple, on fabrique le cache d'une fonction qui utilise les entities article et tag pour mettre en place son retour. On met en cache le résultat de cette focntion en nommant sa clef ainis:
+#article-tag#xxxxxxxxxxx
+
+De cette façon, le service créé "testa.cache_invalidator" qui se déclenche à chaque modification en base de données peut ciblé le cache à supprimer suite à une modification des entités liées (voir fonctionnement de Testa/ArticleBundle/Cache/CacheInvalidator.php)
+
+---
 
 ### Requirements
 

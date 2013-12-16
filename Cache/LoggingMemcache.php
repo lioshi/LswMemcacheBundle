@@ -659,8 +659,31 @@ if ($extension->getVersion()<2) {
             return $result;
         }
 
-        public function set($key, $value, $expiration = null)
+        // public function set($key, $value, $expiration = null)
+        // {
+        //     if (!$this->logging) return parent::set($key, $value, $expiration);
+        //     $start = microtime(true);
+        //     $name = 'set';
+        //     $result = parent::set($key, $value, $expiration);
+        //     $arguments = array($key, $value, $expiration);
+        //     $time = microtime(true) - $start;
+        //     $this->calls[] = (object) compact('start', 'time', 'name', 'arguments', 'result');
+        //     return $result;
+        // }
+
+        public function set($key, $value, $expiration = null, $linkedModels = array())
         {
+            // add linked models to current cache in another cache
+            $cacheLinks = '__linkedModelsToCachedKeys';
+            if (is_array($linkedModels) && count($linkedModels)){
+                if ($this->get($cacheLinks)){
+                    $cacheLinksContent = $this->get($cacheLinks);
+                    $cacheLinksContent[$key] = array_unique(array_merge($cacheLinksContent[$key],$linkedModels));
+                } else {
+                    $this->set($cacheLinks,array($key => $linkedModels),0);                    
+                }
+            }
+
             if (!$this->logging) return parent::set($key, $value, $expiration);
             $start = microtime(true);
             $name = 'set';
