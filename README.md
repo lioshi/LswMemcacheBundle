@@ -1,5 +1,5 @@
-LswMemcacheBundle
-=================
+LswMemcacheBundle (Forked by lioshi)
+====================================
 
 ![screenshot](http://www.leaseweblabs.com/wp-content/uploads/2013/03/memcache_debug.png)
 
@@ -41,7 +41,7 @@ Finally, add the bundle to the registerBundles function of the AppKernel class i
     {
         $bundles = array(
             ...
-            new Lsw\MemcacheBundle\LswMemcacheBundle(),
+            new lioshi\MemcacheBundle\LswMemcacheBundle(),
             ...
         );
 
