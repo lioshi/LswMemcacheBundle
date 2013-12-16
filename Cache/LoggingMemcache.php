@@ -678,7 +678,11 @@ if ($extension->getVersion()<2) {
             if (is_array($linkedModels) && count($linkedModels)){
                 if ($this->get($cacheLinks)){
                     $cacheLinksContent = $this->get($cacheLinks);
-                    $cacheLinksContent[$key] = array_unique(array_merge($cacheLinksContent[$key],$linkedModels));
+                    if (isset($cacheLinksContent[$key])){
+                        $cacheLinksContent[$key] = array_unique(array_merge($cacheLinksContent[$key],$linkedModels));
+                    } else {
+                        $cacheLinksContent[$key] = $linkedModels;
+                    }
                 } else {
                     $this->set($cacheLinks,array($key => $linkedModels),0);                    
                 }
