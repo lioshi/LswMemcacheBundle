@@ -14,8 +14,7 @@ use \Exception;
 
 class CacheInvalidator 
 {
-
-   
+  
     public function __construct($container)
     {
         $this->container = $container;
@@ -93,7 +92,11 @@ return;
 
     }
 
-    private function getMemcacheKeys() {
+    /**
+     * get all keys from memecahced servers hosts in parameters
+     * @return [type] [description]
+     */
+    public function getMemcacheKeys() {
         $return = array();
 
         $paramMemcachehosts = $this->container->getParameter('memcachedhosts');  // get parameters hosts for memcached 
