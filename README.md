@@ -26,7 +26,7 @@ To install LswMemcacheBundle with Composer just add the following to your 'compo
 
     {
         require: {
-            "leaseweb/memcache-bundle": "*",
+            "lioshi/memcache-bundle": "*",
             ...
         }
     }
@@ -41,7 +41,7 @@ Finally, add the bundle to the registerBundles function of the AppKernel class i
     {
         $bundles = array(
             ...
-            new lioshi\MemcacheBundle\LswMemcacheBundle(),
+            new Lsw\MemcacheBundle\LswMemcacheBundle(),
             ...
         );
 
