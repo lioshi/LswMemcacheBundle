@@ -13,6 +13,13 @@ It has full Web Debug Toolbar integration that allows you to analyze and debug t
 
 [Read the LeaseWebLabs blog about LswMemcacheBundle](http://www.leaseweblabs.com/2013/03/memcache-support-in-symfony2-wdt/)
 
+### Added by lioshi
+#### Cache invalidator
+... to complete
+
+#### Ful page cache
+... to complete
+
 ### Requirements
 
 - PHP 5.3.x or 5.4.x
@@ -23,6 +30,15 @@ NB: Unlike the PHP "memcache" extension, the PHP "memcached" extension is not (y
 ### Installation
 
 To install LswMemcacheBundle with Composer just add the following to your 'composer.json' file:
+
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/lioshi/LswMemcacheBundle.git"
+        }
+    ],
+
+(...)
 
     {
         require: {
