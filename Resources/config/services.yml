@@ -1,0 +1,7 @@
+services:
+    lsw.cache_invalidator:
+        class: Lsw\MemcacheBundle\Cache\CacheInvalidator
+        public: false
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+        arguments: [ @service_container ]
