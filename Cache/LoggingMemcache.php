@@ -676,17 +676,19 @@ if ($extension->getVersion()<2) {
             // add linked models to current cache in another cache
             $cacheLinks = '__linkedModelsToCachedKeys';
             if (is_array($linkedModels) && count($linkedModels)){
+                
+                // array of models with key value
+                $linkedModels = array_flip($linkedModels);
+                foreach ($linkedModels as $linkedModel => $val) {
+                    $linkedModels[$linkedModel] = array();
+                    $linkedModels[$linkedModel][] = $key;
+                }
+
                 if ($this->get($cacheLinks)){
                     $cacheLinksContent = $this->get($cacheLinks);
-                    if (isset($cacheLinksContent[$key])){
-                        $cacheLinksContent[$key] = array_unique(array_merge($cacheLinksContent[$key],$linkedModels));
-                    } else {
-                        $cacheLinksContent[$key] = $linkedModels;
-                    }
-                    $this->set($cacheLinks,$cacheLinksContent,0); 
-                    
+                    $this->set($cacheLinks,array_merge_recursive($cacheLinksContent,$linkedModels),0); 
                 } else {
-                    $this->set($cacheLinks,array($key => $linkedModels),0);                    
+                    $this->set($cacheLinks,$linkedModels,0);                    
                 }
             }
 
