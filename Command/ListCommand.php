@@ -56,20 +56,24 @@ class ListCommand extends ContainerAwareCommand
                 $prefix = $input->getArgument('prefix');
                 if (substr($key, 0, strlen($prefix)) == $prefix){
                   $i++;
-                  $output->writeln('<info>'.$i.'</info> <comment>'.$key.'</comment>');
+                  $state = ($memcache->get($key))?'':'<error> empty </error>';
+                  $output->writeln('<info>'.$i.'</info> <comment>'.$key.'</comment> '.$state);
                   $keys[$i] = $key;
                 }
               } else {
                 $i++;
-                $output->writeln('<info>'.$i.'</info> <comment>'.$key.'</comment>');
+                $state = ($memcache->get($key))?'':'<error> empty </error>';
+                $output->writeln('<info>'.$i.'</info> <comment>'.$key.'</comment> '.$state);
                 $keys[$i] = $key;
               }
               
             }
-            if (!$i) $output->writeln('<info>No cache</info>');
-             
-            // display cache content?
-            print_r($this->getCacheContent($keys, $memcache, $output));
+            if (!$i){
+              $output->writeln('<info>No cache</info>');
+            } else {
+              // display cache content?
+              print_r($this->getCacheContent($keys, $memcache, $output));
+            }
 
         } catch (ServiceNotFoundException $e) {
             $output->writeln("<error>client '$client' is not found</error>");

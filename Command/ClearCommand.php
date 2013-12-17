@@ -73,15 +73,6 @@ class ClearCommand extends ContainerAwareCommand
             } else {
               $output->writeln($memcache->flush()?'<info>Delete all cache OK</info>':'<error>Delete all cache ERROR</error>');
               $output->writeln($messageCacheClear);
-
-
-              // $CacheInvalidator = new CacheInvalidator($this->getContainer());
-              // $i=0;
-              // foreach ($CacheInvalidator->getMemcacheKeys() as $key) {
-              //     $output->writeln($memcache->delete($key)?'<info>Delete cache key "'.$key.'" OK</info>':'<error>Delete cache key "'.$key.'" ERROR</error>');
-              // }
-
-
             }
         } catch (ServiceNotFoundException $e) {
             $output->writeln("<error>client '$client' is not found</error>");

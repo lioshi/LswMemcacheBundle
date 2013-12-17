@@ -38,7 +38,7 @@ Dans une requete doctrine (cache result doctrine), !! attention au TTL (time to 
     $tags = $this->createQueryBuilder('tag')
          ->select('tag.name')
          ->getQuery()
-         ->useResultCache(true, 3600, '#tag#results_suffix_all')    
+         ->useResultCache(true, 3600, 'results_suffix_all')    
          ->getResult()
      ;
 
@@ -96,8 +96,6 @@ Configure the bundle by adding the following to app/config/config.yml':
 
 ```yml
 lsw_memcache:
-    session:
-        client: default
     clients:
         default:
             hosts:
