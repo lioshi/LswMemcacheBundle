@@ -29,9 +29,8 @@ class ListCommand extends ContainerAwareCommand
         ->setDescription('List all Memcache items')
         ->setDefinition(array(
             new InputArgument('client', InputArgument::REQUIRED, 'The client'),
-            new InputArgument('prefix', InputArgument::OPTIONAL, 'Lis only cache keys with this prefix'),
+            new InputArgument('prefix', InputArgument::OPTIONAL, 'List only cache keys with this prefix'),
         ))
-        
         ;
    }
 
@@ -91,11 +90,12 @@ class ListCommand extends ContainerAwareCommand
         if (!$input->getArgument('client')) {
             $client = $this->getHelper('dialog')->askAndValidate(
                 $output,
-                'Please give the client:',
+                '<question>Please give the client (default):</question>',
                 function($client)
                 {
                    if (empty($client)) {
-                       throw new \Exception('client can not be empty');
+                      $client = 'default';
+                      // throw new \Exception('client can not be empty');
                    }
 
                    return $client;
@@ -107,7 +107,7 @@ class ListCommand extends ContainerAwareCommand
         if (!$input->getArgument('prefix')) {
             $prefix = $this->getHelper('dialog')->askAndValidate(
                 $output,
-                'Please give the prefix and enter, or enter directly:',
+                '<question>Please give the prefix and enter, or enter directly:</question>',
                 function($prefix)
                 {
                    return $prefix;
@@ -121,7 +121,7 @@ class ListCommand extends ContainerAwareCommand
       
       $key = $this->getHelper('dialog')->askAndValidate(
           $output,
-          'Display which cache key content (write number) or enter:',
+          '<question>Display which cache key content (write number) or enter:</question>',
           function($key)
           {
             return $key;

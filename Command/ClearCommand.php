@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 use Lsw\MemcacheBundle\Cache\CacheInvalidator as CacheInvalidator;
 
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\ArgvInput;
+
 /**
  * Provides a command-line interface for flushing memcache content
  */
@@ -47,10 +50,11 @@ class ClearCommand extends ContainerAwareCommand
    {
         $client = $input->getArgument('client');
         try {
+            $messageCacheClear = "<error> WARNING: You must launch 'cache:clear --env=prod' NOW to prevent login check issue </error>";
             $memcache = $this->getContainer()->get('memcache.'.$client);
             
             // total flush or delete by prefix?
-            if ($input->getArgument('prefix') && $input->getArgument('prefix')){
+            if ($input->getArgument('prefix') && $input->getArgument('prefix') != ''){
               $prefix = $input->getArgument('prefix');
               $CacheInvalidator = new CacheInvalidator($this->getContainer());
               $i=0;
@@ -61,9 +65,23 @@ class ClearCommand extends ContainerAwareCommand
                   $output->writeln($memcache->delete($key)?'<info>Delete cache key "'.$key.'" OK</info>':'<error>Delete cache key "'.$key.'" ERROR</error>');
                 }
               }
-              if (!$i) $output->writeln('<info>No cache delete</info>');
+              if ($i){
+                $output->writeln($messageCacheClear);
+              } else {
+                $output->writeln('<info>No cache delete</info>');
+              }
             } else {
               $output->writeln($memcache->flush()?'<info>Delete all cache OK</info>':'<error>Delete all cache ERROR</error>');
+              $output->writeln($messageCacheClear);
+
+
+              // $CacheInvalidator = new CacheInvalidator($this->getContainer());
+              // $i=0;
+              // foreach ($CacheInvalidator->getMemcacheKeys() as $key) {
+              //     $output->writeln($memcache->delete($key)?'<info>Delete cache key "'.$key.'" OK</info>':'<error>Delete cache key "'.$key.'" ERROR</error>');
+              // }
+
+
             }
         } catch (ServiceNotFoundException $e) {
             $output->writeln("<error>client '$client' is not found</error>");
@@ -84,11 +102,12 @@ class ClearCommand extends ContainerAwareCommand
         if (!$input->getArgument('client')) {
             $client = $this->getHelper('dialog')->askAndValidate(
                 $output,
-                'Please give the client:',
+                '<question>Please give the client (default):</question>',
                 function($client)
                 {
                    if (empty($client)) {
-                       throw new \Exception('client can not be empty');
+                      $client = 'default';
+                      // throw new \Exception('client can not be empty');
                    }
 
                    return $client;
@@ -100,7 +119,7 @@ class ClearCommand extends ContainerAwareCommand
         if (!$input->getArgument('prefix')) {
             $prefix = $this->getHelper('dialog')->askAndValidate(
                 $output,
-                'Please give the prefix and enter, or enter directly:',
+                '<question>Please give the prefix and enter, or enter directly:</question>',
                 function($prefix)
                 {
                    return $prefix;
