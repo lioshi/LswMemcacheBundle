@@ -1,6 +1,8 @@
 <?php
 namespace Lsw\MemcacheBundle\Cache;
 
+use Lsw\MemcacheBundle\Cache\CacheInvalidator as CacheInvalidator;
+
 $extension = new \ReflectionExtension('memcached');
 if ($extension->getVersion()<2) {
 
@@ -31,6 +33,10 @@ if ($extension->getVersion()<2) {
             }
         }
 
+        public function getLinkedModelsToCachedKeysName() {
+            return '__linkedModelsToCachedKeys';
+        }
+        
         /**
          * Get the logged calls for this Memcached object
          *
@@ -522,6 +528,10 @@ if ($extension->getVersion()<2) {
             }
         }
 
+        public function getLinkedModelsToCachedKeysName() {
+            return '__linkedModelsToCachedKeys';
+        }
+
         /**
          * Get the logged calls for this Memcached object
          *
@@ -674,7 +684,8 @@ if ($extension->getVersion()<2) {
         public function set($key, $value, $expiration = null, $linkedModels = array())
         {
             // add linked models to current cache in another cache
-            $cacheLinks = '__linkedModelsToCachedKeys';
+            $cacheLinks = $this->getLinkedModelsToCachedKeysName();
+
             if (is_array($linkedModels) && count($linkedModels)){
                 
                 // array of models with key value

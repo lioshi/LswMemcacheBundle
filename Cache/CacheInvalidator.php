@@ -37,55 +37,65 @@ $fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w");
             'delete' => $uow->getScheduledEntityDeletions()
         );
 
-        $cacheIds = array();
-
-        $cachelogs = date('Y-m-d h:i:s')."\n";
+        $classesToDelete = array();
+        
         foreach ($scheduledEntityChanges as $change => $entities) {
             foreach($entities as $entity) {
-                if (method_exists($entity, 'getId')){
-                    $id = $entity->getId();
-                } else {
-                    $id = '-';
-                }
-                $cachelogs .= get_class($entity).' '.$id.' '.$change."\n";
+                // if (method_exists($entity, 'getId')){
+                //     $id = $entity->getId();
+                // } else {
+                //     $id = '-';
+                // }
+                // $classesToDelete .= get_class($entity).' '.$id.' '.$change."\n";
+                $classesToDelete[] = get_class($entity);
+            }
+        }
 
-                // on récupère la classe de l'objet
-                $class = get_class($entity);
-                if (strrpos($class, "\\")===false){
-                    $classesToDelete[] = $class;
-                } else {
-                    $classesToDelete[] = strtolower(substr($class, strrpos($class, "\\")+1));
+        $loggingMemcache = new LoggingMemcache;
+        $LinkedModelsToCachedKeys = $this->getMemCached()->get($loggingMemcache->getLinkedModelsToCachedKeysName());
+        $cachelogs = count($LinkedModelsToCachedKeys)."\n";
+
+        foreach ($classesToDelete as $classToDelete) {
+
+            $cachelogs .= $classToDelete."\n";
+
+            $cachelogs .= "-> ".count($LinkedModelsToCachedKeys[$classToDelete])."\n";
+
+            if (isset($LinkedModelsToCachedKeys[$classToDelete])){
+                foreach ($LinkedModelsToCachedKeys[$classToDelete] as $key) {
+                    $cachelogs .= $key."\n";
                 }
             }
         }
 
-        foreach ($classesToDelete as $class) {
-            $cachelogs .= "to delete =".$class."\n";
-        }
 
-
-        foreach ($this->getMemcacheKeys() as $key) {
-            $cachelogs .= $key."\n";
-            // extract class from key
-            $classesFromKey = $this->getClassFromKey($key);
-
-            if (count($classesFromKey)){
-                foreach ($classesFromKey as $classFromkey) {
-
-                    $cachelogs .= "=".$classFromkey."\n";
+        // $memcache = new \Memcached;
+        // $memcache->addServers($servers);
 
 
 
-                    if (in_array($classFromkey, $classesToDelete)){
-                        $cachelogs .= "->>>>> to delete\n";
+        // foreach ($this->getMemcacheKeys() as $key) {
+        //     $cachelogs .= $key."\n";
+        //     // extract class from key
+        //     $classesFromKey = $this->getClassFromKey($key);
 
-                        // $memcache = new \Memcached;
-                        // $memcache->addServers($servers); // connect to those servers
-                        // $memcache->delete();
-                    }
-                }
-            }
-        }
+        //     if (count($classesFromKey)){
+        //         foreach ($classesFromKey as $classFromkey) {
+
+        //             $cachelogs .= "=".$classFromkey."\n";
+
+
+
+        //             if (in_array($classFromkey, $classesToDelete)){
+        //                 $cachelogs .= "->>>>> to delete\n";
+
+        //                 // $memcache = new \Memcached;
+        //                 // $memcache->addServers($servers); // connect to those servers
+        //                 // $memcache->delete();
+        //             }
+        //         }
+        //     }
+        // }
 
 fputs($fp, $cachelogs); 
 return;
@@ -97,7 +107,11 @@ return;
      * @return [type] [description]
      */
     public function getMemcacheKeys() {
-        $return = array();
+
+        return $this->getMemCached()->getAllKeys();
+    } 
+
+    private function getMemCached() {
 
         $paramMemcachehosts = $this->container->getParameter('memcachedhosts');  // get parameters hosts for memcached 
         // $servers = array(
@@ -111,21 +125,9 @@ return;
         $memcache = new \Memcached;
         $memcache->addServers($servers); // connect to those servers
 
-        return $memcache->getAllKeys();
-    } 
-
-    private function getClassFromKey($key) {
-
-        preg_match('/#.*#/', $key, $matches);
-        if (count($matches)){
-            $matches[0] = str_replace('#', '', $matches[0]);
-            return explode('-', $matches[0]);
-        } else {
-            return array();
-        }
-        
-
+        return $memcache;
     }
 
-
+ 
+    
 }
