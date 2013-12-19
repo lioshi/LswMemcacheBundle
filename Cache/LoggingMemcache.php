@@ -1,7 +1,7 @@
 <?php
-namespace Lsw\MemcacheBundle\Cache;
+namespace Lsw\MemcacheBundle\Cache; 
 
-use Lsw\MemcacheBundle\Cache\CacheInvalidator as CacheInvalidator;
+//use Lsw\MemcacheBundle\Cache\CacheInvalidator as CacheInvalidator;
 
 $extension = new \ReflectionExtension('memcached');
 if ($extension->getVersion()<2) {

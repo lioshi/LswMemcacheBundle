@@ -55,6 +55,7 @@ class CacheInvalidator
         $memcached = $this->getMemCached();
 
         $LinkedModelsToCachedKeys = $memcached->get($loggingMemcache->getLinkedModelsToCachedKeysName());
+        // $LinkedModelsToCachedKeys = '__linkedModelsToCachedKeys';
         $cachelogs = count($LinkedModelsToCachedKeys)."\n";
 
         foreach ($classesToDelete as $classToDelete) {
