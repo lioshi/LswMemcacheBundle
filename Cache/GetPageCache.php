@@ -30,7 +30,7 @@ class GetPageCache
             // return;
         }
 
-        throw new HttpException(405, 'Aaaaah');
+        // throw new HttpException(405, 'Aaaaah');
 
         // if ($controller[0] instanceof TokenAuthenticatedController) {
 
