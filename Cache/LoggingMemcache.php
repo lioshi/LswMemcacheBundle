@@ -36,7 +36,7 @@ if ($extension->getVersion()<2) {
         public function getLinkedModelsToCachedKeysName() {
             return '__linkedModelsToCachedKeys';
         }
-        
+
         /**
          * Get the logged calls for this Memcached object
          *
@@ -683,7 +683,26 @@ if ($extension->getVersion()<2) {
 
         public function set($key, $value, $expiration = null, $linkedModels = array())
         {
-            // add linked models to current cache in another cache
+            // add linked models to current cache in getLinkedModelsToCachedKeysName cache
+            // create an array like this:
+            // 
+            // Array
+            // (
+            //     [Project\MyBundle\Entity\Car] => Array
+            //         (
+            //             [0] => memcached_key_id_1
+            //         )
+            //     [Project\MyBundle\Entity\Wheel] => Array
+            //         (
+            //             [0] => memcached_key_id_1
+            //             [1] => memcached_key_id_3
+            //         )
+            //     [Project\MyBundle\Entity\Store] => Array
+            //         (
+            //             [0] => memcached_key_id_2
+            //         )
+            // )
+
             $cacheLinks = $this->getLinkedModelsToCachedKeysName();
 
             if (is_array($linkedModels) && count($linkedModels)){
@@ -697,7 +716,12 @@ if ($extension->getVersion()<2) {
 
                 if ($this->get($cacheLinks)){
                     $cacheLinksContent = $this->get($cacheLinks);
-                    $this->set($cacheLinks,array_merge_recursive($cacheLinksContent,$linkedModels),0); 
+                    $linkedModels = array_merge_recursive($cacheLinksContent,$linkedModels);
+                    // delete doublons 
+                    foreach ($linkedModels as $model => $arrayListOfKeys) {
+                        $linkedModelsUnique[$model] = array_unique($arrayListOfKeys);
+                    } 
+                    $this->set($cacheLinks, $linkedModelsUnique,0); 
                 } else {
                     $this->set($cacheLinks,$linkedModels,0);                    
                 }

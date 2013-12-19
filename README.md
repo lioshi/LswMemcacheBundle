@@ -16,13 +16,13 @@ It has full Web Debug Toolbar integration that allows you to analyze and debug t
 ---
 ### Added by lioshi
 #### Cache invalidator
-When doctrine made an insert/update/delete action... to complete
+When doctrine made an insert/update/delete action Lsw/MemcacheBundle/Cache/CacheInvalidator.php is launched. 
 
 #### Ful page cache
 ... to complete
 
-####Plusieurs façons de créer du cache
-Dans un controleur (cache memcached) en spécifiant les entities qui sont liées. Afin que le cahce invalidator puisse les supprimer.
+####How create a cache
+In a controller, or in a repository, or in a class you must specify entities which are linked, the cacheInvalidator know cache to delete when a model is modified
 
     $this->container->get('memcache.default')->set(
         'suffix_all', 
@@ -32,8 +32,9 @@ Dans un controleur (cache memcached) en spécifiant les entities qui sont liées
                 'Testa\ArticleBundle\Article'
         )
     );
+See : Lsw/MemcacheBundle/Cache/LoggingMemcache.php function set()
 
-Dans une requete doctrine (cache result doctrine), !! attention au TTL (time to live) 
+In a doctrine query use useResultCache() function. Beware of TTL (time to live), the cache invalidator not delete this memcached entries
 
     $tags = $this->createQueryBuilder('tag')
          ->select('tag.name')
@@ -41,13 +42,6 @@ Dans une requete doctrine (cache result doctrine), !! attention au TTL (time to 
          ->useResultCache(true, 3600, 'results_suffix_all')    
          ->getResult()
      ;
-
-####Gestion du cache 
-L'idée est de nommer les clef de cache en les préfixant par le ou les modèle desquelles le cache dépend. 
-Exemple, on fabrique le cache d'une fonction qui utilise les entities article et tag pour mettre en place son retour. On met en cache le résultat de cette focntion en nommant sa clef ainis:
-#article-tag#xxxxxxxxxxx
-
-De cette façon, le service créé "testa.cache_invalidator" qui se déclenche à chaque modification en base de données peut ciblé le cache à supprimer suite à une modification des entités liées (voir fonctionnement de Testa/ArticleBundle/Cache/CacheInvalidator.php)
 
 ---
 

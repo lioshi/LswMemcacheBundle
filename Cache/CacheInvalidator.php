@@ -52,18 +52,18 @@ $fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w");
         }
 
         $loggingMemcache = new LoggingMemcache;
-        $LinkedModelsToCachedKeys = $this->getMemCached()->get($loggingMemcache->getLinkedModelsToCachedKeysName());
+        $memcached = $this->getMemCached();
+        
+        $LinkedModelsToCachedKeys = $memcached->get($loggingMemcache->getLinkedModelsToCachedKeysName());
         $cachelogs = count($LinkedModelsToCachedKeys)."\n";
 
         foreach ($classesToDelete as $classToDelete) {
 
-            $cachelogs .= $classToDelete."\n";
-
-            $cachelogs .= "-> ".count($LinkedModelsToCachedKeys[$classToDelete])."\n";
-
+            $cachelogs .= 'Classes to delete : '.$classToDelete."\n";
             if (isset($LinkedModelsToCachedKeys[$classToDelete])){
                 foreach ($LinkedModelsToCachedKeys[$classToDelete] as $key) {
-                    $cachelogs .= $key."\n";
+                    $memcached->delete($key);
+                    $cachelogs .= 'Key deleted : '.$key."\n";
                 }
             }
         }
