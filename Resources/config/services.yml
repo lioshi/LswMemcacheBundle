@@ -5,3 +5,9 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
         arguments: [ @service_container ]
+
+    lsw.get_page_cache:
+        class: Lsw\MemcacheBundle\Cache\GetPageCache
+        arguments: ['@service_container']
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
