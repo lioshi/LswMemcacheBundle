@@ -43,6 +43,10 @@ In a doctrine query use useResultCache() function. Beware of TTL (time to live),
          ->getResult()
      ;
 
+####Commands
+The ```memcache:clear``` can delete all memcached keys and all memcached keys with prefix too
+The ```memcache:list``` can list all memcached keys and can display a key
+
 ---
 
 ### Requirements
