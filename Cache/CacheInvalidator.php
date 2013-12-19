@@ -23,12 +23,12 @@ class CacheInvalidator
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
         
-$fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w"); 
+// $fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w"); 
 
         $em = $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
 
-        // $uow->getScheduledCollectionDeletions()
+        // $uow->getScheduledCollectionDeletions() 
         // $uow->getScheduledCollectionUpdates()
 
         $scheduledEntityChanges = array(
@@ -53,7 +53,7 @@ $fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w");
 
         $loggingMemcache = new LoggingMemcache;
         $memcached = $this->getMemCached();
-        
+
         $LinkedModelsToCachedKeys = $memcached->get($loggingMemcache->getLinkedModelsToCachedKeysName());
         $cachelogs = count($LinkedModelsToCachedKeys)."\n";
 
@@ -68,37 +68,8 @@ $fp = fopen("/data/www/testa/web/logInvalidatorCache.txt","w");
             }
         }
 
-
-        // $memcache = new \Memcached;
-        // $memcache->addServers($servers);
-
-
-
-        // foreach ($this->getMemcacheKeys() as $key) {
-        //     $cachelogs .= $key."\n";
-        //     // extract class from key
-        //     $classesFromKey = $this->getClassFromKey($key);
-
-        //     if (count($classesFromKey)){
-        //         foreach ($classesFromKey as $classFromkey) {
-
-        //             $cachelogs .= "=".$classFromkey."\n";
-
-
-
-        //             if (in_array($classFromkey, $classesToDelete)){
-        //                 $cachelogs .= "->>>>> to delete\n";
-
-        //                 // $memcache = new \Memcached;
-        //                 // $memcache->addServers($servers); // connect to those servers
-        //                 // $memcache->delete();
-        //             }
-        //         }
-        //     }
-        // }
-
-fputs($fp, $cachelogs); 
-return;
+// fputs($fp, $cachelogs); 
+        return;
 
     }
 
