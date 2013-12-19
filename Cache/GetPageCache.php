@@ -22,14 +22,27 @@ class GetPageCache
     public function onKernelRequest(GetResponseEvent $event)
     {
 
+        return;
+
+
+
 $html = 
-'zaeaezae'
+'
+
+zaeaezae'
 
 
 ;
 
-        $response = new Response($html);
+        
+        $response = new Response( json_encode( $html ) );
+        $response->headers->set('Content-Type', 'text/html');
+
         $event->setResponse($response);
+
+
+
+
         return;
 
 
