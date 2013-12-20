@@ -40,14 +40,17 @@ class CacheInvalidator
         $classesToDelete = array();
         
         foreach ($scheduledEntityChanges as $change => $entities) {
+            $idsFlush = array();
             foreach($entities as $entity) {
-                // if (method_exists($entity, 'getId')){
-                //     $id = $entity->getId();
-                // } else {
-                //     $id = '-';
-                // }
-                // $classesToDelete .= get_class($entity).' '.$id.' '.$change."\n";
-                $classesToDelete[] = get_class($entity);
+                if (method_exists($entity, 'getId')){
+                    $idsFlush[] = $entity->getId();
+                } 
+                if (is_array($classesToDelete[get_class($entity)])){
+                    $a = $classesToDelete[get_class($entity)];
+                } else {
+                    $a = array();
+                }
+                $classesToDelete[get_class($entity)] = array_merge($idsFlush, $a);
             }
         }
 
@@ -58,13 +61,18 @@ class CacheInvalidator
         // $LinkedModelsToCachedKeys = '__linkedModelsToCachedKeys';
         $cachelogs = count($LinkedModelsToCachedKeys)."\n";
 
-        foreach ($classesToDelete as $classToDelete) {
+        foreach ($classesToDelete as $classToDelete => $idsFlush) {
 
-            $cachelogs .= 'Classes to delete : '.$classToDelete."\n";
+            $cachelogs .= 'Doctrine flush Classes to delete : '.$classToDelete."\n";
+            $cachelogs .= 'Doctrine flush Ids               : '.implode(',',$idsFlush)."\n";
+
             if (isset($LinkedModelsToCachedKeys[$classToDelete])){
-                foreach ($LinkedModelsToCachedKeys[$classToDelete] as $key) {
-                    $memcached->delete($key);
-                    $cachelogs .= 'Key deleted : '.$key."\n";
+                foreach ($LinkedModelsToCachedKeys[$classToDelete] as $key => $entitiesIds) {
+                    $cachelogs .= 'Ids entities of cache            : '.implode(',',$entitiesIds)."\n";
+                    if (count(array_intersect($entitiesIds, $idsFlush))){
+                        $memcached->delete($key);
+                        $cachelogs .= 'Key deleted                      : '.$key."\n";
+                    }
                 }
             }
         }

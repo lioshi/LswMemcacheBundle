@@ -716,14 +716,14 @@ if ($extension->getVersion()<2) {
                         $linkedModels[$linkedModel][$key] = $entitiesIds;
                     }
 
-                    if (!$this->get($cacheLinks)){
+                    if ($this->get($cacheLinks)){
                         $cacheLinksContent = $this->get($cacheLinks);
                         $linkedModels = array_merge_recursive($cacheLinksContent,$linkedModels);
-                        // delete doublons 
-                        foreach ($linkedModels as $model => $arrayListOfKeys) {
-                            $linkedModelsUnique[$model] = array_unique($arrayListOfKeys);
-                        } 
-                        $this->set($cacheLinks, $linkedModelsUnique,0); 
+                        // // delete doublons 
+                        // foreach ($linkedModels as $model => $arrayListOfKeys) {
+                        //     $linkedModelsUnique[$model] = array_unique($arrayListOfKeys);
+                        // } 
+                        $this->set($cacheLinks, $linkedModels,0); 
                     } else {
                         $this->set($cacheLinks,$linkedModels,0);                    
                     }

@@ -22,15 +22,16 @@ When doctrine made an insert/update/delete action Lsw/MemcacheBundle/Cache/Cache
 ... to complete
 
 ####How create a cache
-In a controller, or in a repository, or in a class you must specify entities which are linked, the cacheInvalidator know cache to delete when a model is modified
+In a controller, or in a repository, or in a class you must specify entities (__model and an array of ids, or an empty array if all ids are concerned__) which are linked, the cacheInvalidator know cache to delete when a model is modified
 IMPORTANT: you must specify the sf2 env to differentiate cache, with ```$this->container->get('kernel')->getEnvironment()```
+
 
     $this->container->get('memcache.default')->set(
         'appli_'.$this->container->get('kernel')->getEnvironment().'suffix_all', 
         $returnSort, 
         3600, 
-        array(  'Testa\ArticleBundle\Motif', 
-                'Testa\ArticleBundle\Article'
+        array(  'Testa\ArticleBundle\Motif' => array(1,23,36), 
+                'Testa\ArticleBundle\Article' => array()
         )
     );
 See : Lsw/MemcacheBundle/Cache/LoggingMemcache.php function set()

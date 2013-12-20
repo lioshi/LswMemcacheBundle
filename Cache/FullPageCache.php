@@ -52,31 +52,21 @@ $event->getRequest()->getUri()
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-
-    return;
-
-    $html = 
-    '
-    '.$this->container->get('kernel')->getEnvironment().'   
-    ssdd '
-
-
-    ;
-
+        $keyCacheName = 'FPC_'.$event->getRequest()->getUri();
+        if ($this->container->get('memcache.default')->get($keyCacheName)){
             
-            $response = new Response( json_encode( $html ) );
-            $response->headers->set('Content-Type', 'text/html');
-
-            $event->setResponse($response);
-
-
-
-
             return;
 
+        } else {
 
+            $response = $event->getResponse();
+            $this->container->get('memcache.default')->set($keyCacheName, $response, 0);
+
+            return $response;
 
         }
+
+    }
 
 
 }
