@@ -703,7 +703,7 @@ if ($extension->getVersion()<2) {
             //         )
             // )
 
-            if(in_array($this->container->get('kernel')->getEnvironment(), array('prod'))) {
+            // if(in_array($this->get('kernel')->getEnvironment(), array('prod'))) {
                 
                 $cacheLinks = $this->getLinkedModelsToCachedKeysName();
 
@@ -728,7 +728,7 @@ if ($extension->getVersion()<2) {
                         $this->set($cacheLinks,$linkedModels,0);                    
                     }
                 }
-            }
+            // }
 
             if (!$this->logging) return parent::set($key, $value, $expiration);
             $start = microtime(true);

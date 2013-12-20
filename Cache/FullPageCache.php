@@ -22,11 +22,11 @@ class FullPageCache
     public function onKernelRequest(GetResponseEvent $event)
     {
 
-return;
+ return;
 
 $html = 
 '
-
+'.$this->container->get('kernel')->getEnvironment().'   
 zaeaezae'
 
 
