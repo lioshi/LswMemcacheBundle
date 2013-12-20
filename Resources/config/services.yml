@@ -6,8 +6,10 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
         arguments: [ @service_container ]
 
-    lsw.get_page_cache:
-        class: Lsw\MemcacheBundle\Cache\GetPageCache
+    lsw.full_page_cache:
+        class: Lsw\MemcacheBundle\Cache\FullPageCache
         arguments: ['@service_container']
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+

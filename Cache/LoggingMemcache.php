@@ -703,27 +703,30 @@ if ($extension->getVersion()<2) {
             //         )
             // )
 
-            $cacheLinks = $this->getLinkedModelsToCachedKeysName();
-
-            if (is_array($linkedModels) && count($linkedModels)){
+            if(in_array($this->container->get('kernel')->getEnvironment(), array('prod'))) {
                 
-                // array of models with key value
-                $linkedModels = array_flip($linkedModels);
-                foreach ($linkedModels as $linkedModel => $val) {
-                    $linkedModels[$linkedModel] = array();
-                    $linkedModels[$linkedModel][] = $key;
-                }
+                $cacheLinks = $this->getLinkedModelsToCachedKeysName();
 
-                if ($this->get($cacheLinks)){
-                    $cacheLinksContent = $this->get($cacheLinks);
-                    $linkedModels = array_merge_recursive($cacheLinksContent,$linkedModels);
-                    // delete doublons 
-                    foreach ($linkedModels as $model => $arrayListOfKeys) {
-                        $linkedModelsUnique[$model] = array_unique($arrayListOfKeys);
-                    } 
-                    $this->set($cacheLinks, $linkedModelsUnique,0); 
-                } else {
-                    $this->set($cacheLinks,$linkedModels,0);                    
+                if (is_array($linkedModels) && count($linkedModels)){
+                    
+                    // array of models with key value
+                    $linkedModels = array_flip($linkedModels);
+                    foreach ($linkedModels as $linkedModel => $val) {
+                        $linkedModels[$linkedModel] = array();
+                        $linkedModels[$linkedModel][] = $key;
+                    }
+
+                    if ($this->get($cacheLinks)){
+                        $cacheLinksContent = $this->get($cacheLinks);
+                        $linkedModels = array_merge_recursive($cacheLinksContent,$linkedModels);
+                        // delete doublons 
+                        foreach ($linkedModels as $model => $arrayListOfKeys) {
+                            $linkedModelsUnique[$model] = array_unique($arrayListOfKeys);
+                        } 
+                        $this->set($cacheLinks, $linkedModelsUnique,0); 
+                    } else {
+                        $this->set($cacheLinks,$linkedModels,0);                    
+                    }
                 }
             }
 
