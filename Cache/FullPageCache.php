@@ -28,31 +28,14 @@ class FullPageCache
         if ($this->container->get('memcache.default')->get($keyCacheName)){
             
             $response = $this->container->get('memcache.default')->get($keyCacheName);
+            $response->headers->add(array('fpc' => true ));
             $event->setResponse($response);
             return; 
 
         } else {
 
-            // $response = new Response( 'not FPC' );
-            // $response->headers->set('Content-Type', 'text/html');
-            // $event->setResponse($response);
             return;
-
         }
-
-        
-        // $response = new Response( json_encode( $html ) );
-        // $response->headers->set('Content-Type', 'text/html');
-
-        // $event->setResponse($response);
-
-
-
-
-        // return;
-
-
-
     }
 
 
@@ -68,11 +51,28 @@ class FullPageCache
 
             $response = $event->getResponse();
 
+            // put this in page candidate to FPC
+            // $response->headers->add(array('models-entities' => '{sqdsqdsqdsqd}'));
+
             // save to memcached if response content has {entityModelLinks}
             $contentTypesAllowedInCache = array('application/json', 'text/html');
-            if (in_array($response->headers->get('content-type'), $contentTypesAllowedInCache)){
+            
+            if (array_key_exists('models-entities', $response->headers)){
+                $modelsEntities = true; 
+            } else {
+                $modelsEntities = false; 
+            }
 
-                $this->container->get('memcache.default')->set($keyCacheName, $response, 0);
+            if (
+                in_array($response->headers->get('content-type'), $contentTypesAllowedInCache) &&
+                $modelsEntities
+                ){
+
+                $this->container->get('memcache.default')->set($keyCacheName, $response, 0, array(
+                        // how get the models and entities id link to this page?
+                        // how get via response?
+
+                    ));
             }
 
             return $response;
