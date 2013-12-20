@@ -710,13 +710,13 @@ if ($extension->getVersion()<2) {
                 if (is_array($linkedModels) && count($linkedModels)){
                     
                     // array of models with key value
-                    $linkedModels = array_flip($linkedModels);
-                    foreach ($linkedModels as $linkedModel => $val) {
+                    // $linkedModels = array_flip($linkedModels);
+                    foreach ($linkedModels as $linkedModel => $entitiesIds) {
                         $linkedModels[$linkedModel] = array();
-                        $linkedModels[$linkedModel][] = $key;
+                        $linkedModels[$linkedModel][$key] = $entitiesIds;
                     }
 
-                    if ($this->get($cacheLinks)){
+                    if (!$this->get($cacheLinks)){
                         $cacheLinksContent = $this->get($cacheLinks);
                         $linkedModels = array_merge_recursive($cacheLinksContent,$linkedModels);
                         // delete doublons 
