@@ -23,27 +23,33 @@ class FullPageCache
     public function onKernelRequest(GetResponseEvent $event)
     {
 
- return;
+        $keyCacheName = 'FPC_'.$event->getRequest()->getUri();
+        
+        if ($this->container->get('memcache.default')->get($keyCacheName)){
+            
+            $response = $this->container->get('memcache.default')->get($keyCacheName);
+            $event->setResponse($response);
+            return; 
 
-$html = 
-'
-'.$this->container->get('kernel')->getEnvironment().'   
-zaeaezae'.
-$event->getRequest()->getUri()
+        } else {
 
+            // $response = new Response( 'not FPC' );
+            // $response->headers->set('Content-Type', 'text/html');
+            // $event->setResponse($response);
+            return;
 
-;
+        }
 
         
-        $response = new Response( json_encode( $html ) );
-        $response->headers->set('Content-Type', 'text/html');
+        // $response = new Response( json_encode( $html ) );
+        // $response->headers->set('Content-Type', 'text/html');
 
-        $event->setResponse($response);
-
-
+        // $event->setResponse($response);
 
 
-        return;
+
+
+        // return;
 
 
 
@@ -53,6 +59,7 @@ $event->getRequest()->getUri()
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $keyCacheName = 'FPC_'.$event->getRequest()->getUri();
+        
         if ($this->container->get('memcache.default')->get($keyCacheName)){
             
             return;
@@ -60,7 +67,13 @@ $event->getRequest()->getUri()
         } else {
 
             $response = $event->getResponse();
-            $this->container->get('memcache.default')->set($keyCacheName, $response, 0);
+
+            // save to memcached if response content has {entityModelLinks}
+            $contentTypesAllowedInCache = array('application/json', 'text/html');
+            if (in_array($response->headers->get('content-type'), $contentTypesAllowedInCache)){
+
+                $this->container->get('memcache.default')->set($keyCacheName, $response, 0);
+            }
 
             return $response;
 
