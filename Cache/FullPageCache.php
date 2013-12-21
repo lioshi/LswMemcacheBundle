@@ -23,6 +23,8 @@ class FullPageCache
     public function onKernelRequest(GetResponseEvent $event)
     {
 
+return; // do deactivate the listenner action
+
         $keyCacheName = 'FPC_'.$event->getRequest()->getUri();
         
         if ($this->container->get('memcache.default')->get($keyCacheName)){
@@ -41,6 +43,10 @@ class FullPageCache
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
+        
+return $event->getResponse(); // do deactivate the listenner action
+
+
         $keyCacheName = 'FPC_'.$event->getRequest()->getUri();
         
         if ($this->container->get('memcache.default')->get($keyCacheName)){
@@ -52,12 +58,13 @@ class FullPageCache
             $response = $event->getResponse();
 
             // put this in page candidate to FPC
-            // $response->headers->add(array('models-entities' => '{sqdsqdsqdsqd}'));
+            // $response->headers->add(array('linked-entities' => '{sqdsqdsqdsqd}'));
 
             // save to memcached if response content has {entityModelLinks}
             $contentTypesAllowedInCache = array('application/json', 'text/html');
             
-            if (array_key_exists('models-entities', $response->headers)){
+            if (array_key_exists('linked-entities', $response->headers)){
+                // IMPORTANT : Enlever les valeurs de linked-entities avant de la renvoyer, pas de visiilité sur le client pour la var linked-entities
                 $modelsEntities = true; 
             } else {
                 $modelsEntities = false; 
